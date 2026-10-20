@@ -8,6 +8,8 @@ The public website, documentation and release news for [Playtrove](https://githu
 
 The site follows Playtrove's visual style and offers the same pages in English and Portuguese. User and contributor guides show the latest reviewed stable documentation snapshot, labeled with its actual version and never newer than the latest published application release. New releases update downloads and news automatically; guides advance after a separate review. News posts reuse each language of the published GitHub release notes, without an AI service or a separate editorial copy. Markdown is converted and sanitized; active HTML and remote images are not embedded.
 
+The home page presents the real Playtrove 0.7.1 interface through one local, silent video of the app in English, shared by both site languages, with localized feature images. The recording contains no mouse pointer or recording overlays. The video loops while visible, includes playback controls, and pauses when it leaves the screen or the tab is hidden. A visitor's pause is preserved. Reduced motion starts with a still image and manual playback; the same image remains available if video playback fails. Downloads continue to follow the latest published release, independently of the recorded demo version.
+
 ## Develop locally
 
 Use Node.js 24 and npm. From this repository:
@@ -27,6 +29,19 @@ This serves the website locally. It does not start the desktop application or ac
 | `npm run test:site` | Check the built site in headless Chromium, without screenshots |
 
 For browser checks, first install Chromium with `npx playwright install chromium`, then run `npm run test:site` after a build. The generated site goes into `build/`. Generated release posts and build output are not edited or committed manually. For release automation, Pages setup and the GitHub App connection, see [MAINTENANCE.md](MAINTENANCE.md).
+
+## Demo media
+
+Media production is a separate manual maintenance task, outside builds, tests, and CI. It opens only an isolated application instance with a temporary demo library; it never uses a person's library, API keys, ROMs, or installed emulators. The application sources remain unchanged.
+
+With dependencies installed here and a compiled stable application checkout available, run:
+
+```sh
+npx playwright install ffmpeg
+node scripts/capture-demo.mjs --app-dir "<application-checkout>"
+```
+
+Announce the application window before running the capture. The script records only that window at 1280 × 800 and 30 fps, producing one English WebM clip of approximately 28–30 seconds and its shared poster, plus Portuguese and English feature images. Screens are prepared and PNGs captured before recording starts. The demo has no pointer or recording overlays and uses relative pauses between actions; delays extend the recording instead of compressing later pauses. Review the resulting media for privacy and verify playback before committing it. See [MAINTENANCE.md](MAINTENANCE.md) for output paths and the recording contract. Website tests remain headless and do not record screenshots, videos, or traces.
 
 ## Publishing
 

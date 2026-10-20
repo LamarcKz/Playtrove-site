@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import releaseData from '../src/data/releases.json';
 
-// DOM, geometria e teclado somente. A configuração desliga capturas, vídeo e trace.
+// DOM, geometria, teclado e reprodução de mídia. Capturas, gravação e trace ficam desligados.
 const ORIGIN = 'http://127.0.0.1:4173';
 const BASE_PATH = '/Playtrove-site/';
 const LATEST = releaseData.latest.version;
@@ -135,9 +135,19 @@ for (const locale of LOCALES) {
     for (const [index, release] of releaseData.releases.slice(0, 3).entries()) {
       await expectPublishedDate(page.locator('.pt-release-meta time').nth(index), release.publishedAt, locale);
     }
-    const image = page.locator('.pt-product img');
-    await expect(image).toHaveAttribute('src', paths(locale, `img/screenshots/${locale}/library-details.png`));
-    await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+    const video = page.locator('.pt-product video');
+    await expect(video).toHaveAttribute('src', paths(locale, 'media/demo/en/playtrove-0.7.1.webm'));
+    await expect(video).toHaveAttribute('poster', paths(locale, 'img/demo/en/poster.png'));
+    await expect(video).toHaveJSProperty('muted', true);
+    await expect(video).toHaveJSProperty('loop', true);
+    await expect(video).toHaveJSProperty('playsInline', true);
+    await expect(video).toHaveJSProperty('controls', true);
+    await expect(page.locator('.pt-demo-toggle')).toHaveAccessibleName(locale === 'en' ? 'Play demo' : 'Reproduzir demonstração');
+    for (const image of await page.locator('.pt-home img').all()) {
+      await image.scrollIntoViewIfNeeded();
+      await expect(image).toHaveAttribute('alt', /\S/);
+      await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+    }
     await expectNoHorizontalScroll(page);
   });
 
@@ -196,14 +206,15 @@ for (const locale of LOCALES) {
       await openPage(page, locale);
       await expectMainActionsReachable(page);
       await expectNoHorizontalScroll(page);
-      const image = page.locator('.pt-product img');
-      const geometry = await image.evaluate((element: HTMLImageElement) => ({
+      const video = page.locator('.pt-product video');
+      await video.scrollIntoViewIfNeeded();
+      await expectReachable(page.locator('.pt-demo-toggle'), page);
+      const geometry = await video.evaluate((element: HTMLVideoElement) => ({
         width: element.getBoundingClientRect().width,
         height: element.getBoundingClientRect().height,
-        ratio: element.naturalWidth / element.naturalHeight,
       }));
       expect(geometry.width).toBeGreaterThan(0);
-      expect(Math.abs(geometry.height - geometry.width / geometry.ratio)).toBeLessThanOrEqual(1);
+      expect(Math.abs(geometry.height - geometry.width / (1280 / 800))).toBeLessThanOrEqual(1);
       // Tabelas largas e notas publicadas também precisam caber no documento em telas pequenas.
       for (const suffix of ['docs/installation/', 'docs/emulators/', `blog/releases/${LATEST}/`, 'blog/', 'blog/archive/']) {
         await openPage(page, locale, suffix);
@@ -300,3 +311,173 @@ for (const width of [360, 1280]) {
     await expectNoHorizontalScroll(page);
   });
 }
+
+for (const locale of LOCALES) {
+  const playName = locale === 'en' ? 'Play demo' : 'Reproduzir demonstração';
+  const pauseName = locale === 'en' ? 'Pause demo' : 'Pausar demonstração';
+
+  test(`${locale}: movimento reduzido mantém o pôster até reproduzir pelo teclado`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openPage(page, locale);
+    const primary = page.locator('.pt-hero .pt-button-primary');
+    await primary.hover();
+    await expect(primary).toHaveCSS('transform', 'none');
+    const video = page.locator('.pt-product video');
+    const toggle = page.locator('.pt-demo-toggle');
+    await video.scrollIntoViewIfNeeded();
+    await expect(toggle).toHaveAccessibleName(playName);
+    await expect(video).toHaveJSProperty('paused', true);
+    await expect(video).toHaveJSProperty('currentTime', 0);
+    await expect(page.locator('.pt-reveal.is-pending')).toHaveCount(0);
+    const sections = page.locator('.pt-reveal');
+    expect(await sections.count()).toBeGreaterThan(0);
+    for (const section of await sections.all()) {
+      await expect(section).toHaveCSS('opacity', '1');
+    }
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    await expect(toggle).toHaveAccessibleName(pauseName);
+    await expect(video).toHaveJSProperty('paused', false);
+    await expect.poll(() => video.evaluate((element: HTMLVideoElement) => ({
+      width: element.videoWidth,
+      height: element.videoHeight,
+      duration: Number.isFinite(element.duration) && element.duration > 0,
+      frames: element.getVideoPlaybackQuality().totalVideoFrames > 1,
+    }))).toEqual({ width: 1280, height: 800, duration: true, frames: true });
+    const start = await video.evaluate((element: HTMLVideoElement) => element.currentTime);
+    await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime)).toBeGreaterThan(start + 0.15);
+    // O arquivo deve permitir navegação temporal real, além de reproduzir quadros.
+    const seekTo = await video.evaluate((element: HTMLVideoElement) => element.duration / 2);
+    expect(seekTo).toBeGreaterThan(0);
+    const afterSeek = await video.evaluate(async (element: HTMLVideoElement, target: number) => {
+      await new Promise<void>((resolve) => {
+        element.addEventListener('seeked', () => resolve(), {once: true});
+        element.currentTime = target;
+      });
+      return element.currentTime;
+    }, seekTo);
+    expect(afterSeek).toBeGreaterThan(0);
+    expect(Math.abs(afterSeek - seekTo)).toBeLessThanOrEqual(0.2);
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    await expect(video).toHaveJSProperty('paused', true);
+    await expect(toggle).toHaveAccessibleName(playName);
+  });
+
+  test(`${locale}: autoplay pausa fora da tela e respeita a pausa escolhida`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await openPage(page, locale);
+    const video = page.locator('.pt-product video');
+    const toggle = page.locator('.pt-demo-toggle');
+    await video.scrollIntoViewIfNeeded();
+    await expect(video).toHaveJSProperty('paused', false);
+    await expect(toggle).toHaveAccessibleName(pauseName);
+    await page.locator('footer').scrollIntoViewIfNeeded();
+    await expect(video).toHaveJSProperty('paused', true);
+    await video.scrollIntoViewIfNeeded();
+    await expect(video).toHaveJSProperty('paused', false);
+    await toggle.click();
+    await expect(toggle).toHaveAccessibleName(playName);
+    await expect(video).toHaveJSProperty('paused', true);
+    await page.locator('footer').scrollIntoViewIfNeeded();
+    await video.scrollIntoViewIfNeeded();
+    await expect(toggle).toHaveAccessibleName(playName);
+    await expect(video).toHaveJSProperty('paused', true);
+  });
+
+  test(`${locale}: falha no vídeo mantém a imagem de demonstração acessível`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.route('**/media/demo/**/*.webm', (route) => route.abort('failed'));
+    await openPage(page, locale);
+    // A moldura permanece montada quando um erro troca o vídeo pelo pôster.
+    await page.locator('.pt-product').scrollIntoViewIfNeeded();
+    const poster = page.locator('.pt-product img.pt-demo-poster');
+    await expect(poster).toBeVisible();
+    await expect(poster).toHaveAttribute('src', paths(locale, 'img/demo/en/poster.png'));
+    await expect(poster).toHaveAttribute('alt', /\S/);
+    await expect.poll(() => poster.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+    await expectNoHorizontalScroll(page);
+  });
+}
+
+for (const locale of LOCALES) {
+  test(`${locale}: opções de apresentação trocam imagens e texto alternativo pelo teclado`, async ({ page }) => {
+    await openPage(page, locale);
+    const showcases = page.locator('.pt-showcase');
+    await expect(showcases).toHaveCount(2);
+    const views = [
+      {first: locale === 'en' ? 'Grid' : 'Grade', second: 'Kanban', firstFile: 'library-grid.png', secondFile: 'library-kanban.png'},
+      {first: locale === 'en' ? 'Achievements' : 'Conquistas', second: locale === 'en' ? 'Statistics' : 'Estatísticas', firstFile: 'achievements.png', secondFile: 'statistics.png'},
+    ];
+    for (const [index, view] of views.entries()) {
+      const section = showcases.nth(index);
+      const group = section.getByRole('group');
+      await expect(group).toHaveAccessibleName(/\S/);
+      const first = group.getByRole('button', {name: view.first, exact: true});
+      const second = group.getByRole('button', {name: view.second, exact: true});
+      const image = section.locator('img');
+      await expect(first).toHaveAttribute('aria-pressed', 'true');
+      await expect(second).toHaveAttribute('aria-pressed', 'false');
+      await expect(image).toHaveAttribute('src', paths(locale, `img/demo/${locale}/${view.firstFile}`));
+      const originalAlt = await image.getAttribute('alt');
+      await second.focus();
+      await page.keyboard.press('Enter');
+      await expect(second).toHaveAttribute('aria-pressed', 'true');
+      await expect(first).toHaveAttribute('aria-pressed', 'false');
+      await expect(image).toHaveAttribute('src', paths(locale, `img/demo/${locale}/${view.secondFile}`));
+      await expect(image).toHaveAttribute('alt', /\S/);
+      expect(await image.getAttribute('alt')).not.toBe(originalAlt);
+      await image.scrollIntoViewIfNeeded();
+      await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+      await first.focus();
+      await page.keyboard.press('Enter');
+      await expect(first).toHaveAttribute('aria-pressed', 'true');
+      await expect(image).toHaveAttribute('src', paths(locale, `img/demo/${locale}/${view.firstFile}`));
+    }
+    await expectNoHorizontalScroll(page);
+  });
+}
+
+test('a demonstração pausa com a página oculta sem perder a intenção do visitante', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await openPage(page, 'pt-BR');
+  const video = page.locator('.pt-product video');
+  const toggle = page.locator('.pt-demo-toggle');
+  await video.scrollIntoViewIfNeeded();
+  await expect(video).toHaveJSProperty('paused', false);
+  const setHidden = async (hidden: boolean) => page.evaluate((value) => {
+    Object.defineProperty(document, 'hidden', {configurable: true, get: () => value});
+    document.dispatchEvent(new Event('visibilitychange'));
+  }, hidden);
+  await setHidden(true);
+  await expect(video).toHaveJSProperty('paused', true);
+  await setHidden(false);
+  await expect(video).toHaveJSProperty('paused', false);
+  await toggle.click();
+  await expect(video).toHaveJSProperty('paused', true);
+  await setHidden(true);
+  await setHidden(false);
+  await expect(video).toHaveJSProperty('paused', true);
+  await expect(toggle).toHaveAccessibleName('Reproduzir demonstração');
+});
+
+test('pausar e retomar durante o início da reprodução respeita a última escolha', async ({ page }) => {
+  // Simula uma confirmação de reprodução lenta sem substituir a mídia real.
+  await page.addInitScript(() => {
+    const play = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      return play.call(this).then(() => new Promise<void>((resolve) => setTimeout(resolve, 1200)));
+    };
+  });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await openPage(page, 'pt-BR');
+  const video = page.locator('.pt-product video');
+  const toggle = page.locator('.pt-demo-toggle');
+  await video.scrollIntoViewIfNeeded();
+  await expect(toggle).toHaveAccessibleName('Pausar demonstração');
+  await toggle.click();
+  await expect(toggle).toHaveAccessibleName('Reproduzir demonstração');
+  await toggle.click();
+  await expect(video).toHaveJSProperty('paused', false);
+  await expect(toggle).toHaveAccessibleName('Pausar demonstração');
+});

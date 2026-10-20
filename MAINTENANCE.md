@@ -8,6 +8,42 @@
 - Os posts vêm das notas bilíngues publicadas no GitHub. Preservar o texto de cada idioma, a tag, a data original e o link da release, sem reescrever por IA. O Markdown é convertido em HTML sanitizado: HTML ativo e imagens remotas não são incorporados. Builds posteriores também refletem correções feitas nas notas. Não há commits automáticos de posts.
 - Os instaladores continuam hospedados nas Releases do aplicativo. Uma publicação do site não muda a versão nem lança o aplicativo.
 
+## Apresentação e mídia demonstrativa
+
+A identidade permanece azul e escura, com a fonte Geist local. A abertura aproxima os downloads da demonstração; os recursos usam imagens reais de organização da biblioteca e de progresso, com uma faixa própria para privacidade. As entradas de seção usam opacidade e deslocamento de até 16 px durante 400 ms; os botões usam transições de 150 ms. `prefers-reduced-motion` desativa esses movimentos.
+
+O componente de demonstração usa mídia local, com caminhos compatíveis com o prefixo do GitHub Pages. O vídeo é silencioso, em repetição, com controles acessíveis; a reprodução automática acontece apenas enquanto ele está visível e a aba está ativa. Sair da tela ou ocultar a aba pausa o vídeo, sem apagar uma pausa escolhida pelo visitante. Com movimento reduzido, a imagem de capa aparece até a reprodução manual. A imagem também permanece disponível em caso de falha de carregamento ou formato não suportado.
+
+A mídia atual demonstra a versão **0.7.1**, em **1280 × 800 e 30 fps**, por aproximadamente **28–30 segundos**, com o aplicativo **em inglês**. O mesmo vídeo e a mesma imagem de capa em inglês são usados nas páginas em português e inglês; as imagens dos recursos continuam localizadas. O rótulo identifica a versão efetivamente gravada, sem acompanhar automaticamente a versão dos downloads ou dos guias. O roteiro é Grade → Detalhes → abrir/fechar Filtros → Grade com busca e limpeza gradual do texto → Kanban → Grade → Conquistas → Estatísticas → Biblioteca em Grade. As imagens mostram a mesma biblioteca demonstrativa. Nenhum mockup gerado substitui a interface real do aplicativo.
+
+Para preservar o movimento natural, preparar as telas e carregar suas imagens antes de gravar. Os PNGs são capturados em uma etapa anterior, fora do screencast: `screenshot({animations: 'disabled'})` pode finalizar transições ou reiniciar animações e não deve interferir no vídeo. O roteiro usa pausas relativas completas após cada ação, sem recuperar atrasos por deadlines absolutos. A gravação não contém ponteiro do mouse, títulos de ações nem sobreposições de gravação. A volta intermediária à Grade mantém o retorno final visualmente contínuo.
+
+### Produzir ou atualizar a mídia
+
+Essa etapa é manual e separada da validação do site. O build, os testes e os workflows não abrem o aplicativo nem geram mídia. O checkout estável do aplicativo deve ter as dependências instaladas e estar compilado na versão exigida pelo script; suas fontes não são alteradas.
+
+Na pasta do site:
+
+```sh
+npx playwright install ffmpeg
+node scripts/capture-demo.mjs --app-dir "<checkout-do-aplicativo>"
+```
+
+Por padrão, o script recria os quatro PNGs dos recursos em português e inglês e grava somente o vídeo e a imagem de capa em inglês. `--locale en` atualiza as imagens em inglês e a gravação; `--locale pt-BR` atualiza somente as imagens em português, preservando o vídeo, a capa e a duração existentes. `--video-only` regrava somente o vídeo e a capa em inglês, mantendo as oito imagens dos recursos. Nenhuma opção gera vídeo ou capa em português.
+
+`capture-demo.mjs` recebe o caminho por argumento, sem versionar caminhos pessoais. Ele usa a versão estável do checkout já compilado (a mídia atual é da 0.7.1) e grava somente a página da janela do Electron, sem desktop nem áudio. Usa banco e pastas temporários, capas públicas e valores inventados, com detecção de emuladores desativada. Não lê nem copia bibliotecas pessoais, chaves ou configurações de emuladores; não abre jogos. Avisar antes de abrir a janela e encerrar somente a instância criada para a demonstração.
+
+As saídas versionadas são:
+
+- `static/media/demo/en/playtrove-0.7.1.webm`: vídeo único em inglês, com meta de até 8 MiB, compartilhado pelas duas versões do site.
+- `static/img/demo/en/poster.png`: imagem de capa em inglês, compartilhada na abertura.
+- `static/img/demo/{pt-BR,en}/{library-grid,library-kanban,achievements,statistics}.png`: imagens das seções localizadas, na proporção original.
+- `src/data/demo.json`: versão, dimensões, fps, duração e caminhos de mídia; a abertura sempre aponta para o vídeo e a capa em inglês.
+
+Revisar as mídias antes do commit: nenhuma outra janela, caminho pessoal, credencial ou dado de usuário pode aparecer. Conferir duração, tamanho, proporção, movimento real, ausência de ponteiro e sobreposições de gravação, localização das imagens dos recursos e uso do mesmo vídeo em inglês nas duas versões do site. Ao atualizar a versão gravada, atualizar o script, o manifesto, os nomes dos arquivos e os rótulos juntos; uma release nova do aplicativo não regrava a demonstração automaticamente.
+
+Os testes do site continuam usando fixtures e Chromium sem interface, com screenshots, vídeo e trace desligados. A autorização de 2026-10-20 para produzir a demonstração é uma exceção específica para as mídias públicas isoladas; não libera o acesso a dados privados nem muda a validação padrão do site.
+
 ## Workflows deste repositório
 
 `ci.yml` roda em pull requests para `main`: instala com `npm ci`, executa `npm test` e compila com `npm run build:test`. Depois instala somente o Chromium do Playwright e roda `npm run test:site` no build de teste, sem capturas. Tem somente `contents: read` e usa fixtures.
