@@ -2,7 +2,8 @@
   "version": "0.7.1",
   "width": 1280,
   "height": 800,
-  "durationSeconds": 28,
+  "fps": 30,
+  "durationSeconds": 29,
   "locales": {
     "pt-BR": {
       "video": "/media/demo/pt-BR/playtrove-0.7.1.webm",

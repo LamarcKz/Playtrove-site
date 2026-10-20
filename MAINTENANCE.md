@@ -14,7 +14,9 @@ A identidade permanece azul e escura, com a fonte Geist local. A abertura aproxi
 
 O componente de demonstração usa mídia local, com caminhos compatíveis com o prefixo do GitHub Pages. O vídeo é silencioso, em repetição, com controles acessíveis; a reprodução automática acontece apenas enquanto ele está visível e a aba está ativa. Sair da tela ou ocultar a aba pausa o vídeo, sem apagar uma pausa escolhida pelo visitante. Com movimento reduzido, a imagem de capa aparece até a reprodução manual. A imagem também permanece disponível em caso de falha de carregamento ou formato não suportado.
 
-A mídia atual demonstra a versão **0.7.1**, em **1280 × 800**, por aproximadamente **25–30 segundos**, em português e inglês. O rótulo identifica a versão efetivamente gravada, sem acompanhar automaticamente a versão dos downloads ou dos guias. O roteiro é Grade → Detalhes → busca/filtros → Kanban → Conquistas → Estatísticas → Grade. As imagens mostram a mesma biblioteca demonstrativa. Nenhum mockup gerado substitui a interface real do aplicativo.
+A mídia atual demonstra a versão **0.7.1**, em **1280 × 800 e 30 fps**, por aproximadamente **28–30 segundos**, em português e inglês. O rótulo identifica a versão efetivamente gravada, sem acompanhar automaticamente a versão dos downloads ou dos guias. O roteiro é Grade → Detalhes → abrir/fechar Filtros → Grade com busca e limpeza gradual do texto → Kanban → Grade → Conquistas → Estatísticas → Biblioteca em Grade. As imagens mostram a mesma biblioteca demonstrativa. Nenhum mockup gerado substitui a interface real do aplicativo.
+
+Para preservar o movimento natural, preparar as telas e carregar suas imagens antes de gravar. Os PNGs são capturados em uma etapa anterior, fora do screencast: `screenshot({animations: 'disabled'})` pode finalizar transições ou reiniciar animações e não deve interferir no vídeo. O roteiro usa pausas relativas completas após cada ação, sem recuperar atrasos por deadlines absolutos. O ponteiro usa a decoração oficial do Playwright, sem títulos de ações ou rótulos de depuração. A volta intermediária à Grade mantém o retorno final visualmente contínuo.
 
 ### Produzir ou atualizar a mídia
 
@@ -33,7 +35,7 @@ As saídas versionadas são:
 
 - `static/media/demo/{pt-BR,en}/playtrove-0.7.1.webm`: gravações otimizadas, com meta de até 8 MiB por idioma.
 - `static/img/demo/{pt-BR,en}/{poster,library-grid,library-kanban,achievements,statistics}.png`: imagem de capa e imagens das seções, na proporção original.
-- `src/data/demo.json`: versão, dimensões, duração e idiomas da demonstração.
+- `src/data/demo.json`: versão, dimensões, fps, duração e idiomas da demonstração.
 
 Revisar as mídias antes do commit: nenhuma outra janela, caminho pessoal, credencial ou dado de usuário pode aparecer. Conferir duração, tamanho, proporção, movimento real e equivalência dos idiomas. Ao atualizar a versão gravada, atualizar o script, o manifesto, os nomes dos arquivos e os rótulos juntos; uma release nova do aplicativo não regrava a demonstração automaticamente.
 

@@ -41,7 +41,7 @@ npx playwright install ffmpeg
 node scripts/capture-demo.mjs --app-dir "<application-checkout>"
 ```
 
-Announce the application window before running the capture. The script records only that window at 1280 × 800, producing equivalent Portuguese and English WebM clips of approximately 25–30 seconds, posters, and feature images. Review the resulting media for privacy and verify playback before committing it. See [MAINTENANCE.md](MAINTENANCE.md) for output paths and the recording contract. Website tests remain headless and do not record screenshots, videos, or traces.
+Announce the application window before running the capture. The script records only that window at 1280 × 800 and 30 fps, producing equivalent Portuguese and English WebM clips of approximately 28–30 seconds, posters, and feature images. Screens are prepared and PNGs captured before recording starts. The demo uses a visible pointer without debug labels and relative pauses between actions; delays extend the recording instead of compressing later pauses. Review the resulting media for privacy and verify playback before committing it. See [MAINTENANCE.md](MAINTENANCE.md) for output paths and the recording contract. Website tests remain headless and do not record screenshots, videos, or traces.
 
 ## Publishing
 

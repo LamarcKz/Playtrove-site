@@ -347,13 +347,17 @@ for (const locale of LOCALES) {
     const start = await video.evaluate((element: HTMLVideoElement) => element.currentTime);
     await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime)).toBeGreaterThan(start + 0.15);
     // O arquivo deve permitir navegação temporal real, além de reproduzir quadros.
-    const seekTo = await video.evaluate((element: HTMLVideoElement) => {
-      element.currentTime = element.duration / 2;
+    const seekTo = await video.evaluate((element: HTMLVideoElement) => element.duration / 2);
+    expect(seekTo).toBeGreaterThan(0);
+    const afterSeek = await video.evaluate(async (element: HTMLVideoElement, target: number) => {
+      await new Promise<void>((resolve) => {
+        element.addEventListener('seeked', () => resolve(), {once: true});
+        element.currentTime = target;
+      });
       return element.currentTime;
-    });
-    await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.seeking)).toBe(false);
-    const afterSeek = await video.evaluate((element: HTMLVideoElement) => element.currentTime);
-    expect(afterSeek).toBeGreaterThanOrEqual(seekTo - 0.1);
+    }, seekTo);
+    expect(afterSeek).toBeGreaterThan(0);
+    expect(Math.abs(afterSeek - seekTo)).toBeLessThanOrEqual(0.2);
     await toggle.focus();
     await page.keyboard.press('Enter');
     await expect(video).toHaveJSProperty('paused', true);

@@ -32,7 +32,7 @@ const Database = appRequire('better-sqlite3');
 const ts = siteRequire('typescript');
 const WIDTH = 1280;
 const HEIGHT = 800;
-const DURATION = 28;
+const FPS = 30;
 const MAX_VIDEO_BYTES = 8 * 1024 * 1024;
 const DAY = 86400000;
 const now = new Date();
@@ -171,6 +171,7 @@ async function waitForImages(page) {
   });
 }
 
+const recordedDurations = {};
 const workspace = await mkdtemp(join(tmpdir(), 'playtrove-site-demo-'));
 let activeApp;
 const selectedLocale = valueOf('--locale');
@@ -226,53 +227,91 @@ try {
       await page.mouse.move(1240, 775);
       await page.screenshot({ path: join(imageDir, name + '.png'), animations: 'disabled' });
     };
+    // Capturas e pré-aquecimento acontecem antes do vídeo. Nunca acelerar animações durante a gravação.
+    await page.locator('main button[aria-pressed]').filter({ hasText: 'Burnout 3 - Takedown' }).click();
     await mode(words.grid);
-    await waitForImages(page);
     await shot('library-grid');
     await shot('poster');
-    const videoPath = join(mediaDir, 'playtrove-' + version + '.webm');
-    await page.screencast.start({ path: videoPath, size: { width: WIDTH, height: HEIGHT }, quality: 90 });
-    const started = Date.now();
-    const until = async (seconds) => {
-      const wait = started + seconds * 1000 - Date.now();
-      if (wait > 0) await page.waitForTimeout(wait);
-    };
-    await until(3);
+    await mode(words.kanban);
+    await shot('library-kanban');
+    await navigate(words.achievements);
+    await shot('achievements');
+    await navigate(words.stats);
+    await shot('statistics');
+    await navigate(words.library);
     await mode(words.details);
     await page.locator('main button[aria-pressed]').filter({ hasText: 'Burnout 3 - Takedown' }).click();
     await waitForImages(page);
-    await until(7);
-    await page.locator('header').getByRole('button', { name: words.filters, exact: true }).click();
-    await until(9);
-    await page.locator('header').getByRole('button', { name: words.filters, exact: true }).click();
-    await mode(words.grid);
-    const search = page.getByRole('searchbox');
-    await search.pressSequentially('Tekken', { delay: 130 });
-    await until(12);
-    await search.fill('');
-    await mode(words.kanban);
-    await shot('library-kanban');
-    await until(16);
-    await navigate(words.achievements);
-    await shot('achievements');
-    await until(20.5);
-    await navigate(words.stats);
-    await shot('statistics');
-    await until(25);
-    await navigate(words.library);
+    await expect(page.locator('main').getByRole('heading', { name: /Burnout 3 - Takedown/ })).toBeVisible();
     await mode(words.grid);
     await waitForImages(page);
-    await until(DURATION);
+
+    const videoPath = join(mediaDir, 'playtrove-' + version + '.webm');
+    const candidatePath = join(workspace, locale + '.webm');
+    const pause = (milliseconds) => page.waitForTimeout(milliseconds);
+    const sourceFrames = [];
+    await page.screencast.showActions({
+      cursor: 'pointer', duration: 350, style: { title: 'display: none' },
+    });
+    // Posiciona o ponteiro oficial antes de começar, em uma área vazia do cabeçalho.
+    await page.locator('header').click({ position: { x: 690, y: 24 } });
+    await pause(600);
+    await page.screencast.start({
+      path: candidatePath, size: { width: WIDTH, height: HEIGHT }, quality: 90, fps: FPS,
+      onFrame: ({ timestamp }) => { sourceFrames.push(timestamp); },
+    });
+    const started = Date.now();
+    // Cada ação recebe seu tempo de leitura. Uma ação lenta nunca encurta a pausa seguinte.
+    await pause(900);
+    await mode(words.details);
+    await pause(1900);
+    await page.locator('header').getByRole('button', { name: words.filters, exact: true }).click();
+    await pause(1400);
+    await page.locator('header').getByRole('button', { name: words.filters, exact: true }).click();
+    await pause(700);
+    await mode(words.grid);
+    await pause(1100);
+    const search = page.getByRole('searchbox');
+    await search.click();
+    await pause(550);
+    await search.pressSequentially('Tekken', { delay: 190 });
+    await pause(1500);
+    for (let character = 0; character < 6; character++) {
+      await search.press('Backspace');
+      await pause(120);
+    }
+    await pause(850);
+    await mode(words.kanban);
+    await pause(1900);
+    // A volta à Grade é uma ação legível própria; Biblioteca já retorna assim no fim.
+    await mode(words.grid);
+    await pause(1100);
+    await navigate(words.achievements);
+    await pause(2200);
+    await navigate(words.stats);
+    await pause(2200);
+    await navigate(words.library);
+    await pause(1200);
+    await page.locator('header').click({ position: { x: 690, y: 24 } });
+    await pause(700);
+    const elapsedSeconds = (Date.now() - started) / 1000;
     await page.screencast.stop();
+    await page.screencast.hideActions();
     await activeApp.close();
     activeApp = null;
-    const video = await stat(videoPath);
+    const video = await stat(candidatePath);
     if (video.size > MAX_VIDEO_BYTES) throw new Error('O vídeo excedeu o limite de 8 MiB: ' + locale);
-    console.log('Mídia finalizada: ' + locale + ' (' + (video.size / 1048576).toFixed(2) + ' MiB).');
+    if (elapsedSeconds > 35) throw new Error('A gravação excedeu o limite de 35 s: ' + locale);
+    await copyFile(candidatePath, videoPath);
+    const intervals = sourceFrames.slice(1).map((timestamp, index) => (timestamp - sourceFrames[index])).filter((interval) => interval > 0 && interval < 100).sort((a, b) => a - b);
+    console.log('Mídia finalizada: ' + locale + ' (' + (video.size / 1048576).toFixed(2) + ' MiB; ' + elapsedSeconds.toFixed(2) + ' s; ' + FPS + ' fps).');
+    console.log('Quadros originais: ' + sourceFrames.length + '; mediana dos intervalos ativos: ' + (intervals[Math.floor(intervals.length / 2)] ?? 0).toFixed(2) + ' ms.');
+    recordedDurations[locale] = Number(elapsedSeconds.toFixed(2));
+
   }
   const manifestPath = join(SITE, 'src', 'data', 'demo.json');
   const manifest = {
-    version, width: WIDTH, height: HEIGHT, durationSeconds: DURATION,
+    version, width: WIDTH, height: HEIGHT, fps: FPS, durationSeconds: Math.round(Math.max(...Object.values(recordedDurations))),
     locales: Object.fromEntries(Object.keys(LOCALES).map((locale) => [locale, {
       video: '/media/demo/' + locale + '/playtrove-' + version + '.webm',
       poster: '/img/demo/' + locale + '/poster.png',

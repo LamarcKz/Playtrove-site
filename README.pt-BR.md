@@ -41,7 +41,7 @@ npx playwright install ffmpeg
 node scripts/capture-demo.mjs --app-dir "<checkout-do-aplicativo>"
 ```
 
-Avise antes de abrir a janela do aplicativo para a gravação. O script grava somente essa janela em 1280 × 800 e produz vídeos WebM equivalentes de aproximadamente 25–30 segundos em português e inglês, imagens de capa e imagens dos recursos. Revise a privacidade das mídias e confira a reprodução antes de versioná-las. Os caminhos e o contrato da gravação estão no [MAINTENANCE.md](MAINTENANCE.md). Os testes do site continuam sem interface, capturas, vídeos ou traces.
+Avise antes de abrir a janela do aplicativo para a gravação. O script grava somente essa janela em 1280 × 800 e 30 fps e produz vídeos WebM equivalentes de aproximadamente 28–30 segundos em português e inglês, imagens de capa e imagens dos recursos. As telas são preparadas e os PNGs capturados antes de iniciar a gravação. A demonstração usa ponteiro visível sem rótulos de depuração e pausas relativas entre as ações; atrasos prolongam a gravação em vez de comprimir as pausas seguintes. Revise a privacidade das mídias e confira a reprodução antes de versioná-las. Os caminhos e o contrato da gravação estão no [MAINTENANCE.md](MAINTENANCE.md). Os testes do site continuam sem interface, capturas, vídeos ou traces.
 
 ## Publicação
 
