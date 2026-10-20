@@ -136,8 +136,8 @@ for (const locale of LOCALES) {
       await expectPublishedDate(page.locator('.pt-release-meta time').nth(index), release.publishedAt, locale);
     }
     const video = page.locator('.pt-product video');
-    await expect(video).toHaveAttribute('src', paths(locale, `media/demo/${locale}/playtrove-0.7.1.webm`));
-    await expect(video).toHaveAttribute('poster', paths(locale, `img/demo/${locale}/poster.png`));
+    await expect(video).toHaveAttribute('src', paths(locale, 'media/demo/en/playtrove-0.7.1.webm'));
+    await expect(video).toHaveAttribute('poster', paths(locale, 'img/demo/en/poster.png'));
     await expect(video).toHaveJSProperty('muted', true);
     await expect(video).toHaveJSProperty('loop', true);
     await expect(video).toHaveJSProperty('playsInline', true);
@@ -393,7 +393,7 @@ for (const locale of LOCALES) {
     await page.locator('.pt-product').scrollIntoViewIfNeeded();
     const poster = page.locator('.pt-product img.pt-demo-poster');
     await expect(poster).toBeVisible();
-    await expect(poster).toHaveAttribute('src', paths(locale, `img/demo/${locale}/poster.png`));
+    await expect(poster).toHaveAttribute('src', paths(locale, 'img/demo/en/poster.png'));
     await expect(poster).toHaveAttribute('alt', /\S/);
     await expect.poll(() => poster.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
     await expectNoHorizontalScroll(page);

@@ -8,7 +8,7 @@ O site público, a documentação e as novidades das versões do [Playtrove](htt
 
 O site segue o visual do Playtrove e oferece as mesmas páginas em português e inglês. Os guias de usuários e colaboradores mostram o último snapshot de documentação estável revisado, com seu número verdadeiro e nunca à frente da última release publicada do aplicativo. Novas releases atualizam os downloads e as novidades automaticamente; os guias avançam depois de uma revisão própria. Os posts de novidades reaproveitam as notas de cada idioma publicadas nas releases do GitHub, sem serviço de IA nem uma cópia editorial separada. O Markdown é convertido e sanitizado; HTML ativo e imagens remotas não são incorporados.
 
-A página inicial apresenta a interface real do Playtrove 0.7.1 em um vídeo demonstrativo local, sem áudio, e imagens nos dois idiomas. O vídeo se repete enquanto está visível, oferece controles e pausa ao sair da tela ou quando a aba fica oculta. Uma pausa escolhida pelo visitante é preservada. A preferência por movimento reduzido começa com uma imagem e reprodução manual; a mesma imagem permanece disponível se o vídeo falhar. Os downloads continuam acompanhando a última release publicada, independentemente da versão gravada.
+A página inicial apresenta a interface real do Playtrove 0.7.1 em um único vídeo local do aplicativo em inglês, sem áudio, compartilhado pelas duas versões do site, com imagens dos recursos localizadas. A gravação não contém ponteiro do mouse nem sobreposições de gravação. O vídeo se repete enquanto está visível, oferece controles e pausa ao sair da tela ou quando a aba fica oculta. Uma pausa escolhida pelo visitante é preservada. A preferência por movimento reduzido começa com uma imagem e reprodução manual; a mesma imagem permanece disponível se o vídeo falhar. Os downloads continuam acompanhando a última release publicada, independentemente da versão gravada.
 
 ## Desenvolver localmente
 
@@ -41,7 +41,7 @@ npx playwright install ffmpeg
 node scripts/capture-demo.mjs --app-dir "<checkout-do-aplicativo>"
 ```
 
-Avise antes de abrir a janela do aplicativo para a gravação. O script grava somente essa janela em 1280 × 800 e 30 fps e produz vídeos WebM equivalentes de aproximadamente 28–30 segundos em português e inglês, imagens de capa e imagens dos recursos. As telas são preparadas e os PNGs capturados antes de iniciar a gravação. A demonstração usa ponteiro visível sem rótulos de depuração e pausas relativas entre as ações; atrasos prolongam a gravação em vez de comprimir as pausas seguintes. Revise a privacidade das mídias e confira a reprodução antes de versioná-las. Os caminhos e o contrato da gravação estão no [MAINTENANCE.md](MAINTENANCE.md). Os testes do site continuam sem interface, capturas, vídeos ou traces.
+Avise antes de abrir a janela do aplicativo para a gravação. O script grava somente essa janela em 1280 × 800 e 30 fps e produz um vídeo WebM em inglês de aproximadamente 28–30 segundos e sua imagem de capa compartilhada, além das imagens dos recursos em português e inglês. As telas são preparadas e os PNGs capturados antes de iniciar a gravação. A demonstração não tem ponteiro nem sobreposições de gravação e usa pausas relativas entre as ações; atrasos prolongam a gravação em vez de comprimir as pausas seguintes. Revise a privacidade das mídias e confira a reprodução antes de versioná-las. Os caminhos e o contrato da gravação estão no [MAINTENANCE.md](MAINTENANCE.md). Os testes do site continuam sem interface, capturas, vídeos ou traces.
 
 ## Publicação
 

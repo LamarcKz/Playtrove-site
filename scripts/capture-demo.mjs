@@ -1,5 +1,5 @@
 /**
- * Produz mídia pública a partir de uma instância descartável do Playtrove.
+ * Produz imagens localizadas e uma apresentação sempre em inglês, sem ponteiro.
  * Uso: node scripts/capture-demo.mjs --app-dir <checkout-do-aplicativo>
  * Requer o build do app e: npx playwright install ffmpeg
  * Não é executado no build, nos testes ou no CI.
@@ -172,11 +172,21 @@ async function waitForImages(page) {
 }
 
 const recordedDurations = {};
+const selectedLocale = valueOf('--locale');
+const videoOnly = args.includes('--video-only');
+if (selectedLocale && !LOCALES[selectedLocale]) throw new Error('--locale precisa ser pt-BR ou en.');
+if (videoOnly && selectedLocale === 'pt-BR') throw new Error('O vídeo é sempre em inglês. Use --video-only sem pt-BR.');
+const locales = videoOnly ? ['en'] : selectedLocale ? [selectedLocale] : Object.keys(LOCALES);
+const manifestPath = join(SITE, 'src', 'data', 'demo.json');
+let previousManifest = null;
+try {
+  previousManifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error;
+}
+if (!locales.includes('en') && !previousManifest) throw new Error('Gere a apresentação em inglês antes de atualizar somente as imagens em português.');
 const workspace = await mkdtemp(join(tmpdir(), 'playtrove-site-demo-'));
 let activeApp;
-const selectedLocale = valueOf('--locale');
-if (selectedLocale && !LOCALES[selectedLocale]) throw new Error('--locale precisa ser pt-BR ou en.');
-const locales = selectedLocale ? [selectedLocale] : Object.keys(LOCALES);
 try {
   console.log('Baixando somente imagens públicas para a biblioteca de demonstração.');
   const assetRoot = join(workspace, 'assets');
@@ -227,17 +237,26 @@ try {
       await page.mouse.move(1240, 775);
       await page.screenshot({ path: join(imageDir, name + '.png'), animations: 'disabled' });
     };
-    // Capturas e pré-aquecimento acontecem antes do vídeo. Nunca acelerar animações durante a gravação.
+    // Imagens localizadas continuam disponíveis para manutenção; --video-only as preserva.
     await page.locator('main button[aria-pressed]').filter({ hasText: 'Burnout 3 - Takedown' }).click();
     await mode(words.grid);
-    await shot('library-grid');
-    await shot('poster');
+    await waitForImages(page);
+    if (!videoOnly) await shot('library-grid');
     await mode(words.kanban);
-    await shot('library-kanban');
+    await expect(page.locator('main section[aria-label]')).toHaveCount(9);
+    if (!videoOnly) await shot('library-kanban');
     await navigate(words.achievements);
-    await shot('achievements');
+    await expect(page.locator('main dl').first()).toBeVisible();
+    if (!videoOnly) await shot('achievements');
     await navigate(words.stats);
-    await shot('statistics');
+    await expect(page.locator('main dl').first()).toBeVisible();
+    if (!videoOnly) await shot('statistics');
+    if (locale !== 'en') {
+      await activeApp.close();
+      activeApp = null;
+      continue;
+    }
+    // O vídeo e o poster de apresentação são sempre em inglês, em ambos os idiomas do site.
     await navigate(words.library);
     await mode(words.details);
     await page.locator('main button[aria-pressed]').filter({ hasText: 'Burnout 3 - Takedown' }).click();
@@ -245,55 +264,50 @@ try {
     await expect(page.locator('main').getByRole('heading', { name: /Burnout 3 - Takedown/ })).toBeVisible();
     await mode(words.grid);
     await waitForImages(page);
+    await page.screencast.hideActions();
+    await page.screencast.hideOverlays();
+    await shot('poster');
 
     const videoPath = join(mediaDir, 'playtrove-' + version + '.webm');
     const candidatePath = join(workspace, locale + '.webm');
     const pause = (milliseconds) => page.waitForTimeout(milliseconds);
     const sourceFrames = [];
-    await page.screencast.showActions({
-      cursor: 'pointer', duration: 350, style: { title: 'display: none' },
-    });
-    // Posiciona o ponteiro oficial antes de começar, em uma área vazia do cabeçalho.
-    await page.locator('header').click({ position: { x: 690, y: 24 } });
-    await pause(600);
     await page.screencast.start({
       path: candidatePath, size: { width: WIDTH, height: HEIGHT }, quality: 90, fps: FPS,
       onFrame: ({ timestamp }) => { sourceFrames.push(timestamp); },
     });
     const started = Date.now();
-    // Cada ação recebe seu tempo de leitura. Uma ação lenta nunca encurta a pausa seguinte.
-    await pause(900);
+    // Pausas relativas preservam a leitura sem depender de um cursor ou recuperar atrasos.
+    await pause(1200);
     await mode(words.details);
-    await pause(1900);
+    await pause(3000);
     await page.locator('header').getByRole('button', { name: words.filters, exact: true }).click();
-    await pause(1400);
+    await pause(2000);
     await page.locator('header').getByRole('button', { name: words.filters, exact: true }).click();
-    await pause(700);
+    await pause(1200);
     await mode(words.grid);
-    await pause(1100);
+    await pause(1800);
     const search = page.getByRole('searchbox');
     await search.click();
-    await pause(550);
+    await pause(800);
     await search.pressSequentially('Tekken', { delay: 190 });
-    await pause(1500);
+    await pause(2000);
     for (let character = 0; character < 6; character++) {
       await search.press('Backspace');
       await pause(120);
     }
-    await pause(850);
+    await pause(1300);
     await mode(words.kanban);
-    await pause(1900);
+    await pause(3000);
     // A volta à Grade é uma ação legível própria; Biblioteca já retorna assim no fim.
     await mode(words.grid);
-    await pause(1100);
+    await pause(1500);
     await navigate(words.achievements);
-    await pause(2200);
+    await pause(3000);
     await navigate(words.stats);
-    await pause(2200);
+    await pause(3100);
     await navigate(words.library);
-    await pause(1200);
-    await page.locator('header').click({ position: { x: 690, y: 24 } });
-    await pause(700);
+    await pause(2000);
     const elapsedSeconds = (Date.now() - started) / 1000;
     await page.screencast.stop();
     await page.screencast.hideActions();
@@ -309,17 +323,37 @@ try {
     recordedDurations[locale] = Number(elapsedSeconds.toFixed(2));
 
   }
-  const manifestPath = join(SITE, 'src', 'data', 'demo.json');
+  // Uma atualização só de imagens não muda a versão nem os caminhos da mídia já gravada.
+  const presentation = recordedDurations.en === undefined ? {
+    version: previousManifest.version,
+    width: previousManifest.width,
+    height: previousManifest.height,
+    fps: previousManifest.fps,
+    durationSeconds: previousManifest.durationSeconds,
+    video: previousManifest.locales.en.video,
+    poster: previousManifest.locales.en.poster,
+  } : {
+    version, width: WIDTH, height: HEIGHT, fps: FPS,
+    durationSeconds: Math.round(recordedDurations.en),
+    video: '/media/demo/en/playtrove-' + version + '.webm',
+    poster: '/img/demo/en/poster.png',
+  };
   const manifest = {
-    version, width: WIDTH, height: HEIGHT, fps: FPS, durationSeconds: Math.round(Math.max(...Object.values(recordedDurations))),
+    version: presentation.version,
+    width: presentation.width,
+    height: presentation.height,
+    fps: presentation.fps,
+    durationSeconds: presentation.durationSeconds,
     locales: Object.fromEntries(Object.keys(LOCALES).map((locale) => [locale, {
-      video: '/media/demo/' + locale + '/playtrove-' + version + '.webm',
-      poster: '/img/demo/' + locale + '/poster.png',
+      video: presentation.video,
+      poster: presentation.poster,
       images: Object.fromEntries(['library-grid', 'library-kanban', 'achievements', 'statistics'].map((name) => [name, '/img/demo/' + locale + '/' + name + '.png'])),
     }])),
   };
   await mkdir(dirname(manifestPath), { recursive: true });
   await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+  await rm(join(SITE, 'static', 'media', 'demo', 'pt-BR', 'playtrove-' + version + '.webm'), { force: true });
+  await rm(join(SITE, 'static', 'img', 'demo', 'pt-BR', 'poster.png'), { force: true });
 } finally {
   if (activeApp) await activeApp.close().catch(() => {});
   // A pasta foi criada nesta execução e deve continuar dentro do temporário do sistema.

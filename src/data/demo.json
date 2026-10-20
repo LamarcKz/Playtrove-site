@@ -6,8 +6,8 @@
   "durationSeconds": 29,
   "locales": {
     "pt-BR": {
-      "video": "/media/demo/pt-BR/playtrove-0.7.1.webm",
-      "poster": "/img/demo/pt-BR/poster.png",
+      "video": "/media/demo/en/playtrove-0.7.1.webm",
+      "poster": "/img/demo/en/poster.png",
       "images": {
         "library-grid": "/img/demo/pt-BR/library-grid.png",
         "library-kanban": "/img/demo/pt-BR/library-kanban.png",
