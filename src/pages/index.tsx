@@ -37,7 +37,7 @@ const content = {
     requirements: 'Windows 10 e 11 · 64 bits',
     releaseNotes: 'O que mudou nesta versão',
     screenshotAlt: 'Biblioteca de demonstração do Playtrove no modo Detalhes, com a lista de jogos, capa, informações e conquistas.',
-    screenshotCaption: 'Uma biblioteca de demonstração. A sua começa com os seus jogos.',
+    screenshotCaption: 'Biblioteca de demonstração da versão 0.7.0. A sua começa com os seus jogos.',
     overviewTitle: 'Mais tempo jogando. Menos procurando.',
     overviewLead: 'Da próxima partida à última conquista, um lugar para acompanhar a sua coleção.',
     features: [
@@ -77,7 +77,7 @@ const content = {
     requirements: 'Windows 10 and 11 · 64-bit',
     releaseNotes: 'What changed in this version',
     screenshotAlt: 'Playtrove demo library in Details view, showing the game list, cover art, information, and achievements.',
-    screenshotCaption: 'A demo library. Yours starts with your own games.',
+    screenshotCaption: 'Demo library from version 0.7.0. Yours starts with your own games.',
     overviewTitle: 'More time playing. Less time searching.',
     overviewLead: 'From your next session to your latest achievement, one place to follow your collection.',
     features: [
