@@ -7,7 +7,7 @@ const root=path.resolve(fileURLToPath(new URL('../build/',import.meta.url)));
 const portIndex=process.argv.indexOf('--port');
 const port=portIndex<0 ? 4173 : Number(process.argv[portIndex+1]);
 if(!Number.isInteger(port) || port<1 || port>65535) throw new Error('Invalid preview port');
-const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.ico':'image/x-icon','.woff2':'font/woff2','.xml':'application/xml; charset=utf-8','.txt':'text/plain; charset=utf-8'};
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.webm':'video/webm','.jpg':'image/jpeg','.ico':'image/x-icon','.woff2':'font/woff2','.xml':'application/xml; charset=utf-8','.txt':'text/plain; charset=utf-8'};
 const server=http.createServer(async(req,res)=>{
   if(req.method!=='GET' && req.method!=='HEAD') {res.writeHead(405).end();return;}
   try {
@@ -22,7 +22,7 @@ const server=http.createServer(async(req,res)=>{
       file=path.join(file,'index.html');
     }
     const bytes=await fs.readFile(file);
-    res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store'});
+    res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store','Content-Length':bytes.length});
     res.end(req.method==='HEAD'?undefined:bytes);
   } catch {
     res.writeHead(404,{'Content-Type':'text/html; charset=utf-8'});

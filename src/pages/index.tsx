@@ -4,6 +4,10 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import releaseData from '../data/releases.json';
+import DemoVideo from '../components/DemoVideo';
+import FeatureShowcase from '../components/FeatureShowcase';
+import Reveal from '../components/Reveal';
+import demo from '../data/demo.json';
 
 type Locale = 'pt-BR' | 'en';
 
@@ -36,8 +40,22 @@ const content = {
     guide: 'Ler o guia',
     requirements: 'Windows 10 e 11 · 64 bits',
     releaseNotes: 'O que mudou nesta versão',
-    screenshotAlt: 'Biblioteca de demonstração do Playtrove no modo Detalhes, com a lista de jogos, capa, informações e conquistas.',
-    screenshotCaption: 'Biblioteca de demonstração da versão 0.7.0. A sua começa com os seus jogos.',
+    demoLabel: 'Demonstração do aplicativo Playtrove com uma biblioteca de exemplo.',
+    demoCaption: 'Demonstração do Playtrove',
+    demoLibrary: 'Biblioteca de exemplo',
+    playDemo: 'Reproduzir demonstração',
+    pauseDemo: 'Pausar demonstração',
+    demoFailure: 'O vídeo não pôde ser carregado. A imagem mostra a biblioteca de demonstração.',
+    collectionViews: 'Modos da biblioteca',
+    progressViews: 'Conquistas e estatísticas',
+    grid: 'Grade',
+    kanban: 'Kanban',
+    achievements: 'Conquistas',
+    statistics: 'Estatísticas',
+    gridAlt: 'Biblioteca de demonstração no modo Grade, com capas inteiras e status de cada jogo.',
+    kanbanAlt: 'Biblioteca de demonstração no modo Kanban, organizada em colunas por status.',
+    achievementsAlt: 'Conquistas da biblioteca de demonstração, com troféus e progresso dos jogos.',
+    statisticsAlt: 'Estatísticas da biblioteca de demonstração, com tempo jogado e atividade.',
     overviewTitle: 'Mais tempo jogando. Menos procurando.',
     overviewLead: 'Da próxima partida à última conquista, um lugar para acompanhar a sua coleção.',
     features: [
@@ -76,8 +94,22 @@ const content = {
     guide: 'Read the guide',
     requirements: 'Windows 10 and 11 · 64-bit',
     releaseNotes: 'What changed in this version',
-    screenshotAlt: 'Playtrove demo library in Details view, showing the game list, cover art, information, and achievements.',
-    screenshotCaption: 'Demo library from version 0.7.0. Yours starts with your own games.',
+    demoLabel: 'Playtrove application demo with a sample library.',
+    demoCaption: 'Playtrove demo',
+    demoLibrary: 'Sample library',
+    playDemo: 'Play demo',
+    pauseDemo: 'Pause demo',
+    demoFailure: 'The video could not load. The image shows the demo library.',
+    collectionViews: 'Library views',
+    progressViews: 'Achievements and statistics',
+    grid: 'Grid',
+    kanban: 'Kanban',
+    achievements: 'Achievements',
+    statistics: 'Statistics',
+    gridAlt: 'Demo library in Grid view, with complete cover art and each game’s status.',
+    kanbanAlt: 'Demo library in Kanban view, organized into status columns.',
+    achievementsAlt: 'Demo library achievements, with trophies and game progress.',
+    statisticsAlt: 'Demo library statistics, with playtime and activity.',
     overviewTitle: 'More time playing. Less time searching.',
     overviewLead: 'From your next session to your latest achievement, one place to follow your collection.',
     features: [
@@ -157,7 +189,13 @@ export default function Home(): ReactNode {
   const { i18n } = useDocusaurusContext();
   const locale: Locale = i18n.currentLocale === 'en' ? 'en' : 'pt-BR';
   const copy = content[locale];
-  const screenshot = useBaseUrl(`/img/screenshots/${locale}/library-details.png`);
+  const media = useBaseUrl(demo.locales[locale].video);
+  const poster = useBaseUrl(demo.locales[locale].poster);
+  const grid = useBaseUrl(demo.locales[locale].images['library-grid']);
+  const kanban = useBaseUrl(demo.locales[locale].images['library-kanban']);
+  const achievements = useBaseUrl(demo.locales[locale].images.achievements);
+  const statistics = useBaseUrl(demo.locales[locale].images.statistics);
+  const [headingStart, headingEnd] = copy.heading.split(', ');
   const guideUrl = useBaseUrl('/docs/installation/');
   const newsUrl = useBaseUrl('/blog/');
   const latestUrl = useBaseUrl(`/blog/releases/${releases.latest.version}/`);
@@ -166,7 +204,7 @@ export default function Home(): ReactNode {
     <Layout title={copy.pageTitle} description={copy.description}>
       <main className="pt-home">
         <header className="pt-hero pt-container">
-          <h1>{copy.heading}</h1>
+          <h1>{headingStart}, <span>{headingEnd}</span></h1>
           <p className="pt-hero-lead">{copy.lead}</p>
           <DownloadActions locale={locale} />
           <p className="pt-download-meta">
@@ -176,30 +214,39 @@ export default function Home(): ReactNode {
           </p>
         </header>
 
-        <figure className="pt-product pt-container">
-          <div className="pt-product-frame">
-            <img src={screenshot} width="1280" height="800" alt={copy.screenshotAlt} fetchPriority="high" decoding="async" />
-          </div>
-          <figcaption>{copy.screenshotCaption}</figcaption>
-        </figure>
+        <DemoVideo key={media} src={media} poster={poster} label={copy.demoLabel}
+          playLabel={copy.playDemo} pauseLabel={copy.pauseDemo} failureText={copy.demoFailure}
+          caption={`${copy.demoCaption} ${demo.version} · ${copy.demoLibrary}`} />
 
-        <section className="pt-overview pt-container" aria-labelledby="overview-heading">
-          <div className="pt-section-intro">
+        <section className="pt-overview" aria-labelledby="overview-heading">
+          <Reveal className="pt-container pt-section-intro">
             <h2 id="overview-heading">{copy.overviewTitle}</h2>
             <p>{copy.overviewLead}</p>
-          </div>
-          <div className="pt-features">
-            {copy.features.map((feature) => (
-              <div className="pt-feature" key={feature.title}>
-                <h3>{feature.title}</h3>
-                <p>{feature.description}</p>
-              </div>
-            ))}
-          </div>
+          </Reveal>
+          <FeatureShowcase id="collection-heading" title={copy.features[0].title}
+            description={copy.features[0].description} groupLabel={copy.collectionViews}
+            views={[
+              {label: copy.grid, src: grid, alt: copy.gridAlt},
+              {label: copy.kanban, src: kanban, alt: copy.kanbanAlt},
+            ]} />
+          <FeatureShowcase id="progress-heading" title={copy.features[1].title}
+            description={copy.features[1].description} groupLabel={copy.progressViews} reverse
+            views={[
+              {label: copy.achievements, src: achievements, alt: copy.achievementsAlt},
+              {label: copy.statistics, src: statistics, alt: copy.statisticsAlt},
+            ]} />
+          <Reveal className="pt-container pt-privacy">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+              <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z" /><path d="m8.5 12 2.5 2.5 4.5-5" />
+            </svg>
+            <h3>{copy.features[2].title}</h3>
+            <p>{copy.features[2].description}</p>
+          </Reveal>
         </section>
 
         <section className="pt-emulators" aria-labelledby="emulators-heading">
-          <div className="pt-container pt-emulators-inner">
+          <Reveal className="pt-container pt-emulators-inner">
             <div className="pt-emulators-copy">
               <h2 id="emulators-heading">{copy.emulatorsTitle}</h2>
               <p>{copy.emulatorsLead}</p>
@@ -211,7 +258,7 @@ export default function Home(): ReactNode {
               </ul>
               <p className="pt-emulators-note">{copy.emulatorsNote}</p>
             </div>
-          </div>
+          </Reveal>
         </section>
 
         <section className="pt-news pt-container" aria-labelledby="news-heading">

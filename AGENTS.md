@@ -7,5 +7,5 @@ Este repositório é exclusivamente do site. Leia o README e o MAINTENANCE.md an
 - Não edite ou versione posts gerados e arquivos de build. Não faça commits automáticos a partir dos workflows.
 - Nunca inclua chaves, tokens, caminhos pessoais ou a biblioteca real de alguém. O GitHub App é configurado no repositório do aplicativo; sua chave privada nunca entra neste repositório ou em mensagens.
 - Use npm test e npm run build:test para a validação local com fixtures. Não abra o aplicativo, emuladores ou dados privados para testar o site.
-- Nesta tarefa, não faça capturas de tela. Valide estrutura, conteúdo e comportamento por código e testes sem capturas.
+- Os testes do site validam estrutura, conteúdo e comportamento sem capturas, vídeos ou traces. A produção de mídia pública foi autorizada em 2026-10-20 como etapa manual separada: grave apenas a instância isolada de demonstração, com dados temporários e capas públicas, sem acessar bibliotecas pessoais nem abrir emuladores ou jogos. Avise antes de abrir a janela. Siga o contrato em MAINTENANCE.md; as fontes do aplicativo permanecem inalteradas.
 - Atualize os dois READMEs e o MAINTENANCE.md quando seus comandos ou contratos mudarem. Decisões de produto pertencem ao usuário; detalhes técnicos podem ser resolvidos dentro do escopo autorizado.

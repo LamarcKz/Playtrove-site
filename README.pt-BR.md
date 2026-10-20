@@ -8,6 +8,8 @@ O site público, a documentação e as novidades das versões do [Playtrove](htt
 
 O site segue o visual do Playtrove e oferece as mesmas páginas em português e inglês. Os guias de usuários e colaboradores mostram o último snapshot de documentação estável revisado, com seu número verdadeiro e nunca à frente da última release publicada do aplicativo. Novas releases atualizam os downloads e as novidades automaticamente; os guias avançam depois de uma revisão própria. Os posts de novidades reaproveitam as notas de cada idioma publicadas nas releases do GitHub, sem serviço de IA nem uma cópia editorial separada. O Markdown é convertido e sanitizado; HTML ativo e imagens remotas não são incorporados.
 
+A página inicial apresenta a interface real do Playtrove 0.7.1 em um vídeo demonstrativo local, sem áudio, e imagens nos dois idiomas. O vídeo se repete enquanto está visível, oferece controles e pausa ao sair da tela ou quando a aba fica oculta. Uma pausa escolhida pelo visitante é preservada. A preferência por movimento reduzido começa com uma imagem e reprodução manual; a mesma imagem permanece disponível se o vídeo falhar. Os downloads continuam acompanhando a última release publicada, independentemente da versão gravada.
+
 ## Desenvolver localmente
 
 Use Node.js 24 e npm. Nesta pasta:
@@ -27,6 +29,19 @@ Esse comando serve o site localmente. Ele não abre o aplicativo desktop nem ace
 | `npm run test:site` | Confere o site compilado no Chromium sem interface e sem capturas |
 
 Para os testes de navegação, instale o Chromium com `npx playwright install chromium` e rode `npm run test:site` depois de compilar. O site gerado fica em `build/`. Os posts gerados das releases e o resultado da compilação não são editados nem versionados manualmente. Para a automação das releases, a configuração do Pages e a conexão com o GitHub App, veja [MAINTENANCE.md](MAINTENANCE.md).
+
+## Mídia de demonstração
+
+A produção de mídia é uma tarefa manual de manutenção, separada do build, dos testes e do CI. Ela abre somente uma instância isolada do aplicativo com uma biblioteca de demonstração temporária; nunca usa a biblioteca de alguém, chaves de APIs, ROMs ou emuladores instalados. As fontes do aplicativo permanecem inalteradas.
+
+Com as dependências instaladas aqui e um checkout estável do aplicativo já compilado, rode:
+
+```sh
+npx playwright install ffmpeg
+node scripts/capture-demo.mjs --app-dir "<checkout-do-aplicativo>"
+```
+
+Avise antes de abrir a janela do aplicativo para a gravação. O script grava somente essa janela em 1280 × 800 e produz vídeos WebM equivalentes de aproximadamente 25–30 segundos em português e inglês, imagens de capa e imagens dos recursos. Revise a privacidade das mídias e confira a reprodução antes de versioná-las. Os caminhos e o contrato da gravação estão no [MAINTENANCE.md](MAINTENANCE.md). Os testes do site continuam sem interface, capturas, vídeos ou traces.
 
 ## Publicação
 
