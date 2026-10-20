@@ -1,0 +1,141 @@
+{
+  "latestTag": "v0.7.0",
+  "releases": [
+    {
+      "tag_name": "v0.8.0",
+      "draft": true,
+      "prerelease": false,
+      "published_at": null,
+      "body": "Draft fixture.",
+      "assets": []
+    },
+    {
+      "id": 7,
+      "tag_name": "v0.7.0",
+      "name": "Playtrove 0.7.0",
+      "draft": false,
+      "prerelease": false,
+      "published_at": "2026-10-15T16:45:00Z",
+      "html_url": "https://github.com/LamarcKz/Playtrove/releases/tag/v0.7.0",
+      "body": "**English** · [Português](#português)\n\n## What's new\n\n- A demonstration window improvement.\n\n## Notes\n\nThis is fictitious test content.\n\n---\n\n## Português\n\n## Novidades\n\n- Uma melhoria de demonstração na janela.\n\n## Observações\n\nEste conteúdo é fictício e serve somente aos testes.",
+      "assets": [
+        {
+          "id": 700,
+          "name": "Playtrove-Setup-0.7.0.exe",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.7.0/Playtrove-Setup-0.7.0.exe"
+        },
+        {
+          "id": 701,
+          "name": "Playtrove-Setup-0.7.0.exe.blockmap",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.7.0/Playtrove-Setup-0.7.0.exe.blockmap"
+        },
+        {
+          "id": 702,
+          "name": "latest.yml",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.7.0/latest.yml"
+        },
+        {
+          "id": 703,
+          "name": "Playtrove-0.7.0-portable.zip",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.7.0/Playtrove-0.7.0-portable.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.9.0",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-17T12:00:00Z",
+      "body": "Prerelease fixture.",
+      "assets": []
+    },
+    {
+      "id": 5,
+      "tag_name": "v0.5.0",
+      "name": "Playtrove 0.5.0",
+      "draft": false,
+      "prerelease": false,
+      "published_at": "2026-10-08T12:00:00Z",
+      "html_url": "https://github.com/LamarcKz/Playtrove/releases/tag/v0.5.0",
+      "body": "**English** · [Português](#português)\n\n## What's new\n\n- Initial demonstration library.\n\n## Notes\n\nThis is fictitious test content.\n\n---\n\n## Português\n\n## Novidades\n\n- Biblioteca inicial de demonstração.\n\n## Observações\n\nEste conteúdo é fictício e serve somente aos testes.",
+      "assets": [
+        {
+          "id": 500,
+          "name": "Playtrove-Setup-0.5.0.exe",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.5.0/Playtrove-Setup-0.5.0.exe"
+        },
+        {
+          "id": 501,
+          "name": "Playtrove-Setup-0.5.0.exe.blockmap",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.5.0/Playtrove-Setup-0.5.0.exe.blockmap"
+        },
+        {
+          "id": 502,
+          "name": "latest.yml",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.5.0/latest.yml"
+        },
+        {
+          "id": 503,
+          "name": "Playtrove-0.5.0-portable.zip",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.5.0/Playtrove-0.5.0-portable.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v1.0.0-preview.1",
+      "draft": false,
+      "prerelease": false,
+      "published_at": "2026-10-18T12:00:00Z",
+      "body": "Non-stable tag fixture.",
+      "assets": []
+    },
+    {
+      "id": 6,
+      "tag_name": "v0.6.0",
+      "name": "Playtrove 0.6.0",
+      "draft": false,
+      "prerelease": false,
+      "published_at": "2026-10-14T14:30:00Z",
+      "html_url": "https://github.com/LamarcKz/Playtrove/releases/tag/v0.6.0",
+      "body": "**English** · [Português](#português)\n\n## What's new\n\n- Additional demonstration options.\n\n## Notes\n\nThis is fictitious test content.\n\n---\n\n## Português\n\n## Novidades\n\n- Opções adicionais de demonstração.\n\n## Observações\n\nEste conteúdo é fictício e serve somente aos testes.",
+      "assets": [
+        {
+          "id": 600,
+          "name": "Playtrove-Setup-0.6.0.exe",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.6.0/Playtrove-Setup-0.6.0.exe"
+        },
+        {
+          "id": 601,
+          "name": "Playtrove-Setup-0.6.0.exe.blockmap",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.6.0/Playtrove-Setup-0.6.0.exe.blockmap"
+        },
+        {
+          "id": 602,
+          "name": "latest.yml",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.6.0/latest.yml"
+        },
+        {
+          "id": 603,
+          "name": "Playtrove-0.6.0-portable.zip",
+          "browser_download_url": "https://github.com/LamarcKz/Playtrove/releases/download/v0.6.0/Playtrove-0.6.0-portable.zip"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.4.0",
+      "draft": false,
+      "prerelease": false,
+      "published_at": "2026-09-24T12:00:00Z",
+      "body": "Older repository fixture.",
+      "assets": []
+    },
+    {
+      "tag_name": "v0.10.0",
+      "draft": false,
+      "prerelease": false,
+      "published_at": null,
+      "body": "Unpublished fixture.",
+      "assets": []
+    }
+  ]
+}

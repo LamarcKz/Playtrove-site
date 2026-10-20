@@ -1,0 +1,14 @@
+{
+  "item.label.Início": {
+    "message": "Home"
+  },
+  "item.label.Guia": {
+    "message": "Guide"
+  },
+  "item.label.Colaborar": {
+    "message": "Contribute"
+  },
+  "item.label.Novidades": {
+    "message": "News"
+  }
+}

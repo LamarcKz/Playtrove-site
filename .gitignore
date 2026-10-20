@@ -1,0 +1,12 @@
+node_modules/
+build/
+.docusaurus/
+blog/
+i18n/en/docusaurus-plugin-content-blog/release-*.mdx
+src/data/releases.json
+playwright-report/
+test-results/
+.env
+.env.*
+*.pem
+*.key

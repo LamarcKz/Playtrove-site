@@ -1,0 +1,11 @@
+{
+  "title": {
+    "message": "Playtrove news"
+  },
+  "description": {
+    "message": "What's new in every published Playtrove release."
+  },
+  "sidebar.title": {
+    "message": "Releases"
+  }
+}

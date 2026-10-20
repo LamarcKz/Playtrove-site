@@ -1,0 +1,23 @@
+.skipLink {
+  position: fixed;
+  z-index: 3000;
+  top: 1rem;
+  left: 50%;
+  max-width: calc(100% - 2rem);
+  padding: 0.65rem 1rem;
+  border: 1px solid #83c2ff;
+  border-radius: 0.4rem;
+  background: #202a37;
+  color: #edf0f5;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  transform: translate(-50%, calc(-100% - 2rem));
+}
+
+.skipLink:focus {
+  color: #fff;
+  text-decoration: none;
+  transform: translate(-50%, 0);
+}
