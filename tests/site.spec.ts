@@ -14,12 +14,12 @@ const VIEWPORTS = [
   { width: 1280, height: 800 },
   { width: 1920, height: 1080 },
 ];
-const DOCUMENTS = [
+const ALL_DOCUMENTS: { slug: string; pt: string; en: string; since?: string }[] = [
   { slug: 'installation', pt: 'Instalação', en: 'Installation' },
   { slug: 'getting-started', pt: 'Primeiros passos', en: 'Getting started' },
   { slug: 'emulators', pt: 'Emuladores e pastas de ROMs', en: 'Emulators and ROM folders' },
   { slug: 'library', pt: 'Organizar a biblioteca', en: 'Organize your library' },
-  { slug: 'fullscreen', pt: 'Tela cheia', en: 'Fullscreen' },
+  { slug: 'fullscreen', pt: 'Tela cheia', en: 'Fullscreen', since: '1.0.0' },
   { slug: 'metadata', pt: 'Metadados e imagens', en: 'Metadata and images' },
   { slug: 'achievements', pt: 'Conquistas e troféus', en: 'Achievements and trophies' },
   { slug: 'statistics', pt: 'Tempo jogado e estatísticas', en: 'Playtime and statistics' },
@@ -28,6 +28,14 @@ const DOCUMENTS = [
   { slug: 'contributing', pt: 'Contribuir com o projeto', en: 'Contribute to the project' },
   { slug: 'architecture', pt: 'Arquitetura do aplicativo', en: 'Application architecture' },
 ];
+// Um guia que surgiu numa versão só existe nos snapshots a partir dela (a fixture dos testes usa guias antigos).
+const versionParts = (version: string) => version.split('.').map(Number);
+const atLeast = (version: string, minimum: string) => {
+  const [a, b] = [versionParts(version), versionParts(minimum)];
+  for (let index = 0; index < 3; index++) if (a[index] !== b[index]) return a[index] > b[index];
+  return true;
+};
+const DOCUMENTS = ALL_DOCUMENTS.filter((document) => !document.since || atLeast(releaseData.docsVersion, document.since));
 
 const paths = (locale: Locale, suffix = '') => `${BASE_PATH}${locale === 'en' ? 'en/' : ''}${suffix}`;
 const heading = (locale: Locale) => locale === 'en' ? 'Your games, well organized.' : 'Seus jogos, bem organizados.';
