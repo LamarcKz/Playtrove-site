@@ -412,7 +412,7 @@ for (const locale of LOCALES) {
 for (const locale of LOCALES) {
   test(`${locale}: opções de apresentação trocam imagens e texto alternativo pelo teclado`, async ({ page }) => {
     await openPage(page, locale);
-    const showcases = page.locator('.pt-showcase');
+    const showcases = page.locator('.pt-overview .pt-showcase');
     await expect(showcases).toHaveCount(2);
     const views = [
       {first: locale === 'en' ? 'Grid' : 'Grade', second: 'Kanban', firstFile: 'library-grid.png', secondFile: 'library-kanban.png'},
@@ -442,6 +442,37 @@ for (const locale of LOCALES) {
       await page.keyboard.press('Enter');
       await expect(first).toHaveAttribute('aria-pressed', 'true');
       await expect(image).toHaveAttribute('src', paths(locale, `img/demo/${locale}/${view.firstFile}`));
+    }
+    await expectNoHorizontalScroll(page);
+  });
+}
+
+for (const locale of LOCALES) {
+  test(`${locale}: novidades da versão mostram os quatro temas e os cartões, pelo teclado`, async ({ page }) => {
+    await openPage(page, locale);
+    const section = page.locator('.pt-highlights');
+    await expect(section.getByRole('heading', {level: 2})).toHaveText(locale === 'en' ? 'New in 1.0.0' : 'Novidades da 1.0.0');
+    const group = section.getByRole('group', {name: locale === 'en' ? 'Fullscreen themes' : 'Temas da tela cheia'});
+    const buttons = group.getByRole('button');
+    await expect(buttons).toHaveText(locale === 'en' ? ['Playtrove', 'Horizon', 'Mosaic', 'Panel'] : ['Playtrove', 'Horizonte', 'Mosaico', 'Painel']);
+    const image = section.locator('.pt-showcase img');
+    for (const [index, file] of ['fullscreen-library', 'fullscreen-horizonte', 'fullscreen-mosaico', 'fullscreen-painel'].entries()) {
+      await buttons.nth(index).focus();
+      await page.keyboard.press('Enter');
+      await expect(buttons.nth(index)).toHaveAttribute('aria-pressed', 'true');
+      await expect(image).toHaveAttribute('src', paths(locale, `img/highlights/${locale}/${file}.webp`));
+      await expect(image).toHaveAttribute('alt', /\S/);
+      await image.scrollIntoViewIfNeeded();
+      await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+    }
+    const cards = section.locator('.pt-highlight-card');
+    await expect(cards).toHaveCount(2);
+    for (const card of await cards.all()) {
+      await expect(card.getByRole('heading', {level: 3})).toHaveText(/\S/);
+      const picture = card.locator('img');
+      await expect(picture).toHaveAttribute('alt', /\S/);
+      await picture.scrollIntoViewIfNeeded();
+      await expect.poll(() => picture.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
     }
     await expectNoHorizontalScroll(page);
   });

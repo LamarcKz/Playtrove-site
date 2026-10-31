@@ -136,6 +136,15 @@ a { text-underline-offset: 0.2em; }
 .pt-view-options button:hover { color: #fff; background: #2a303a; }
 .pt-view-options button[aria-pressed='true'] { background: var(--pt-brand); color: #fff; }
 .pt-privacy { padding-block: 3.5rem; text-align: center; }
+/* Novidades da versão: os temas da tela cheia e dois cartões com as outras novidades. */
+.pt-highlights { padding-top: clamp(2.5rem, 5vw, 4.5rem); }
+.pt-highlights .pt-section-intro .pt-text-link { margin-left: 0.25rem; white-space: nowrap; }
+.pt-highlight-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.5rem, 3vw, 2.5rem); padding-bottom: clamp(3rem, 5vw, 4.5rem); }
+.pt-highlight-card { min-width: 0; }
+.pt-highlight-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; border: 1px solid #3a424e; border-radius: 0.75rem; background: #0d0f12; }
+.pt-highlight-card h3 { margin: 1.1rem 0 0.4rem; font-size: 1.25rem; font-weight: 650; }
+.pt-highlight-card p { margin: 0; line-height: 1.7; }
+@media (max-width: 760px) { .pt-highlight-cards { grid-template-columns: minmax(0, 1fr); } }
 .pt-privacy > svg { display: block; margin: 0 auto 1rem; color: #a9b3c2; }
 .pt-privacy h3 { margin: 0 auto 0.65rem; font-size: 1.4rem; font-weight: 650; letter-spacing: -0.025em; }
 .pt-privacy p { max-width: 740px; margin: 0 auto; font-size: 0.98rem; line-height: 1.75; }
