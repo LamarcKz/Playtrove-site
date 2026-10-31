@@ -86,6 +86,7 @@ const content = {
     highlights: {
       title: 'Novidades da 1.0.0',
       lead: 'A tela cheia chegou, com quatro temas para jogar do sofá, e todas as capas ficaram iguais.',
+      previous: 'Versões anteriores',
       notes: 'Ler as notas completas',
       themesTitle: 'Tela cheia para a TV',
       themesDescription: 'Navegue pela biblioteca com o DualSense, o teclado ou o mouse. Escolha entre quatro temas, cada um com a própria tela inicial, os próprios detalhes do jogo e os próprios sons.',
@@ -97,6 +98,7 @@ const content = {
         {label: 'Painel', file: 'fullscreen-painel', alt: 'Tema Painel da tela cheia, com a arte no fundo e blocos de continuar jogando, coleções, conquistas e estatísticas.'},
       ],
       cards: [
+        {file: 'fullscreen-horizonte', title: 'Tela cheia com quatro temas', description: 'Jogue do sofá com o DualSense, o teclado ou o mouse, nos temas Playtrove, Horizonte, Mosaico e Painel.', alt: 'Tema Horizonte da tela cheia, com a fileira de jogos no topo e a arte enchendo a tela.'},
         {file: 'library-grid', title: 'Capas iguais em todo lugar', description: 'Todas as capas ficam no mesmo quadro em pé, como no Playnite, e vêm primeiro do SteamGridDB.', alt: 'Biblioteca no modo Grade, com todas as capas no mesmo quadro em pé.'},
         {file: 'library-details', title: 'Música tema e trailers', description: 'Cada jogo pode ter a própria trilha, tocada sem internet, e um trailer sem som atrás dos detalhes.', alt: 'Detalhes de um jogo com a arte de fundo, a nota e as conquistas.'},
       ],
@@ -158,6 +160,7 @@ const content = {
     highlights: {
       title: 'New in 1.0.0',
       lead: 'Fullscreen is here, with four themes for playing from the couch, and every cover now looks the same.',
+      previous: 'Earlier versions',
       notes: 'Read the full release notes',
       themesTitle: 'Fullscreen for the TV',
       themesDescription: 'Browse your library with a DualSense, a keyboard or a mouse. Pick one of four themes, each with its own home screen, game details and sounds.',
@@ -169,6 +172,7 @@ const content = {
         {label: 'Panel', file: 'fullscreen-painel', alt: 'Panel fullscreen theme, with art in the background and tiles for continue playing, collections, achievements and statistics.'},
       ],
       cards: [
+        {file: 'fullscreen-horizonte', title: 'Fullscreen with four themes', description: 'Play from the couch with a DualSense, a keyboard or a mouse, in the Playtrove, Horizon, Mosaic and Panel themes.', alt: 'Horizon fullscreen theme, with a row of games on top and the art filling the screen.'},
         {file: 'library-grid', title: 'Matching covers everywhere', description: 'Every cover uses the same upright frame, as in Playnite, and comes first from SteamGridDB.', alt: 'Library in Grid view, with every cover in the same upright frame.'},
         {file: 'library-details', title: 'Theme music and trailers', description: 'Each game can have its own soundtrack, played offline, and a silent trailer behind its details.', alt: 'Game details with background art, rating and achievements.'},
       ],
@@ -203,31 +207,41 @@ function DownloadActions({ locale }: { locale: Locale }): ReactNode {
 /** As novidades da versão em destaque, escritas à mão a cada lançamento, com as capturas da biblioteca de demonstração. */
 const HIGHLIGHTS_VERSION = '1.0.0';
 
-function Highlights({ locale }: { locale: Locale }): ReactNode {
+/** A tela cheia com os quatro temas, como terceiro recurso da apresentação. */
+function FullscreenFeature({ locale }: { locale: Locale }): ReactNode {
+  const copy = content[locale].highlights;
+  const base = useBaseUrl(`/img/highlights/${locale}/`);
+  return (
+    <FeatureShowcase id="fullscreen-heading" title={copy.themesTitle} description={copy.themesDescription}
+      groupLabel={copy.themesLabel}
+      views={copy.themes.map((theme) => ({label: theme.label, src: `${base}${theme.file}.webp`, alt: theme.alt}))} />
+  );
+}
+
+/** O cartão da versão em destaque, com as novidades escritas à mão e as capturas da biblioteca de demonstração. */
+function LatestRelease({ locale }: { locale: Locale }): ReactNode {
   const copy = content[locale].highlights;
   const base = useBaseUrl(`/img/highlights/${locale}/`);
   const notesUrl = useBaseUrl(`/blog/releases/${HIGHLIGHTS_VERSION}/`);
   // O link só aparece com a release publicada (nos testes, a fixture tem releases mais antigas).
   const published = releases.releases.some((release) => release.version === HIGHLIGHTS_VERSION);
   return (
-    <section className="pt-highlights" aria-labelledby="highlights-heading">
-      <Reveal className="pt-container pt-section-intro">
-        <h2 id="highlights-heading">{copy.title}</h2>
-        <p>{copy.lead}{published && <> <Link className="pt-text-link" to={notesUrl}>{copy.notes}<Arrow /></Link></>}</p>
-      </Reveal>
-      <FeatureShowcase id="highlights-themes-heading" title={copy.themesTitle} description={copy.themesDescription}
-        groupLabel={copy.themesLabel}
-        views={copy.themes.map((theme) => ({label: theme.label, src: `${base}${theme.file}.webp`, alt: theme.alt}))} />
-      <Reveal className="pt-container pt-highlight-cards">
+    <article className="pt-highlights" aria-labelledby="highlights-heading">
+      <div className="pt-highlights-head">
+        <h3 id="highlights-heading">{copy.title}</h3>
+        <p>{copy.lead}</p>
+        {published && <Link className="pt-text-link" to={notesUrl}>{copy.notes}<Arrow /></Link>}
+      </div>
+      <div className="pt-highlight-cards">
         {copy.cards.map((card) => (
-          <article className="pt-highlight-card" key={card.file}>
+          <div className="pt-highlight-card" key={card.file}>
             <img src={`${base}${card.file}.webp`} width="1280" height="800" alt={card.alt} loading="lazy" decoding="async" />
-            <h3>{card.title}</h3>
+            <h4>{card.title}</h4>
             <p>{card.description}</p>
-          </article>
+          </div>
         ))}
-      </Reveal>
-    </section>
+      </div>
+    </article>
   );
 }
 
@@ -281,8 +295,6 @@ export default function Home(): ReactNode {
           </p>
         </header>
 
-        <Highlights locale={locale} />
-
         <DemoVideo key={media} src={media} poster={poster} label={copy.demoLabel}
           playLabel={copy.playDemo} pauseLabel={copy.pauseDemo} failureText={copy.demoFailure}
           caption={`${copy.demoCaption} ${demo.version} · ${copy.demoLibrary}`} />
@@ -304,6 +316,7 @@ export default function Home(): ReactNode {
               {label: copy.achievements, src: achievements, alt: copy.achievementsAlt},
               {label: copy.statistics, src: statistics, alt: copy.statisticsAlt},
             ]} />
+          <FullscreenFeature locale={locale} />
           <Reveal className="pt-container pt-privacy">
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
@@ -338,8 +351,10 @@ export default function Home(): ReactNode {
             </div>
             <Link className="pt-text-link" to={newsUrl}>{copy.allNews}<Arrow /></Link>
           </div>
+          <LatestRelease locale={locale} />
+          <h3 className="pt-release-previous">{copy.highlights.previous}</h3>
           <ol className="pt-release-list">
-            {releases.releases.slice(0, 3).map((release) => <ReleaseRow release={release} locale={locale} key={release.tagName} />)}
+            {releases.releases.filter((release) => release.version !== HIGHLIGHTS_VERSION).slice(0, 3).map((release) => <ReleaseRow release={release} locale={locale} key={release.tagName} />)}
           </ol>
         </section>
 

@@ -1,11 +1,14 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import releaseData from '../src/data/releases.json';
+import demo from '../src/data/demo.json';
 
 // DOM, geometria, teclado e reprodução de mídia. Capturas, gravação e trace ficam desligados.
 const ORIGIN = 'http://127.0.0.1:4173';
 const BASE_PATH = '/Playtrove-site/';
 const LATEST = releaseData.latest.version;
 const VERSIONS = releaseData.releases.map((release) => release.version);
+// A versão das novidades escritas à mão na página inicial (HIGHLIGHTS_VERSION, em src/pages/index.tsx).
+const HIGHLIGHTS_VERSION = '1.0.0';
 const LOCALES = ['pt-BR', 'en'] as const;
 type Locale = typeof LOCALES[number];
 const VIEWPORTS = [
@@ -138,14 +141,16 @@ for (const locale of LOCALES) {
     for (const link of await guides.all()) await expect(link).toHaveAttribute('href', paths(locale, 'docs/installation/'));
     await expect(page.locator('.pt-download-meta a')).toHaveText(`v${LATEST}`);
     await expect(page.locator('.pt-download-meta a')).toHaveAttribute('href', paths(locale, `blog/releases/${LATEST}/`));
-    await expect(page.locator('.pt-release-row')).toHaveCount(Math.min(3, VERSIONS.length));
-    await expect(page.locator('.pt-release-version')).toHaveText(VERSIONS.slice(0, 3));
-    await expect(page.locator('.pt-release-copy p')).toHaveText(releaseData.releases.slice(0, 3).map((release) => release.summary[locale]));
-    for (const [index, release] of releaseData.releases.slice(0, 3).entries()) {
+    // A versão das novidades em destaque fica no cartão; a lista mostra as anteriores.
+    const listed = releaseData.releases.filter((release) => release.version !== HIGHLIGHTS_VERSION).slice(0, 3);
+    await expect(page.locator('.pt-release-row')).toHaveCount(listed.length);
+    await expect(page.locator('.pt-release-version')).toHaveText(listed.map((release) => release.version));
+    await expect(page.locator('.pt-release-copy p')).toHaveText(listed.map((release) => release.summary[locale]));
+    for (const [index, release] of listed.entries()) {
       await expectPublishedDate(page.locator('.pt-release-meta time').nth(index), release.publishedAt, locale);
     }
     const video = page.locator('.pt-product video');
-    await expect(video).toHaveAttribute('src', paths(locale, 'media/demo/en/playtrove-0.7.1.webm'));
+    await expect(video).toHaveAttribute('src', paths(locale, `media/demo/en/playtrove-${demo.version}.webm`));
     await expect(video).toHaveAttribute('poster', paths(locale, 'img/demo/en/poster.png'));
     await expect(video).toHaveJSProperty('muted', true);
     await expect(video).toHaveJSProperty('loop', true);
@@ -413,7 +418,7 @@ for (const locale of LOCALES) {
   test(`${locale}: opções de apresentação trocam imagens e texto alternativo pelo teclado`, async ({ page }) => {
     await openPage(page, locale);
     const showcases = page.locator('.pt-overview .pt-showcase');
-    await expect(showcases).toHaveCount(2);
+    await expect(showcases).toHaveCount(3);
     const views = [
       {first: locale === 'en' ? 'Grid' : 'Grade', second: 'Kanban', firstFile: 'library-grid.png', secondFile: 'library-kanban.png'},
       {first: locale === 'en' ? 'Achievements' : 'Conquistas', second: locale === 'en' ? 'Statistics' : 'Estatísticas', firstFile: 'achievements.png', secondFile: 'statistics.png'},
@@ -448,14 +453,13 @@ for (const locale of LOCALES) {
 }
 
 for (const locale of LOCALES) {
-  test(`${locale}: novidades da versão mostram os quatro temas e os cartões, pelo teclado`, async ({ page }) => {
+  test(`${locale}: a tela cheia mostra os quatro temas e as novidades da versão têm três destaques`, async ({ page }) => {
     await openPage(page, locale);
-    const section = page.locator('.pt-highlights');
-    await expect(section.getByRole('heading', {level: 2})).toHaveText(locale === 'en' ? 'New in 1.0.0' : 'Novidades da 1.0.0');
-    const group = section.getByRole('group', {name: locale === 'en' ? 'Fullscreen themes' : 'Temas da tela cheia'});
+    const feature = page.locator('.pt-overview .pt-showcase').nth(2);
+    const group = feature.getByRole('group', {name: locale === 'en' ? 'Fullscreen themes' : 'Temas da tela cheia'});
     const buttons = group.getByRole('button');
     await expect(buttons).toHaveText(locale === 'en' ? ['Playtrove', 'Horizon', 'Mosaic', 'Panel'] : ['Playtrove', 'Horizonte', 'Mosaico', 'Painel']);
-    const image = section.locator('.pt-showcase img');
+    const image = feature.locator('img');
     for (const [index, file] of ['fullscreen-library', 'fullscreen-horizonte', 'fullscreen-mosaico', 'fullscreen-painel'].entries()) {
       await buttons.nth(index).focus();
       await page.keyboard.press('Enter');
@@ -465,10 +469,12 @@ for (const locale of LOCALES) {
       await image.scrollIntoViewIfNeeded();
       await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
     }
+    const section = page.locator('.pt-news .pt-highlights');
+    await expect(section.getByRole('heading', {level: 3, name: locale === 'en' ? 'New in 1.0.0' : 'Novidades da 1.0.0'})).toBeVisible();
     const cards = section.locator('.pt-highlight-card');
-    await expect(cards).toHaveCount(2);
+    await expect(cards).toHaveCount(3);
     for (const card of await cards.all()) {
-      await expect(card.getByRole('heading', {level: 3})).toHaveText(/\S/);
+      await expect(card.getByRole('heading', {level: 4})).toHaveText(/\S/);
       const picture = card.locator('img');
       await expect(picture).toHaveAttribute('alt', /\S/);
       await picture.scrollIntoViewIfNeeded();
