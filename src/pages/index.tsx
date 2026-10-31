@@ -83,6 +83,24 @@ const content = {
     readRelease: 'Ler as novidades da versão',
     getStartedTitle: 'Pronto para organizar a próxima aventura?',
     getStartedLead: 'Escolha o instalador ou a versão portátil. O guia acompanha seus primeiros passos.',
+    highlights: {
+      title: 'Novidades da 1.0.0',
+      lead: 'A tela cheia chegou, com quatro temas para jogar do sofá, e todas as capas ficaram iguais.',
+      notes: 'Ler as notas completas',
+      themesTitle: 'Tela cheia para a TV',
+      themesDescription: 'Navegue pela biblioteca com o DualSense, o teclado ou o mouse. Escolha entre quatro temas, cada um com a própria tela inicial, os próprios detalhes do jogo e os próprios sons.',
+      themesLabel: 'Temas da tela cheia',
+      themes: [
+        {label: 'Playtrove', file: 'fullscreen-library', alt: 'Tema Playtrove da tela cheia, com o jogo em destaque e uma fileira de capas.'},
+        {label: 'Horizonte', file: 'fullscreen-horizonte', alt: 'Tema Horizonte da tela cheia, com a fileira de jogos no topo, a arte enchendo a tela e cartões de troféus, tempo jogado e nota.'},
+        {label: 'Mosaico', file: 'fullscreen-mosaico', alt: 'Tema Mosaico da tela cheia, com capas grandes e atalhos redondos em cinza-escuro e vermelho.'},
+        {label: 'Painel', file: 'fullscreen-painel', alt: 'Tema Painel da tela cheia, com a arte no fundo e blocos de continuar jogando, coleções, conquistas e estatísticas.'},
+      ],
+      cards: [
+        {file: 'library-grid', title: 'Capas iguais em todo lugar', description: 'Todas as capas ficam no mesmo quadro em pé, como no Playnite, e vêm primeiro do SteamGridDB.', alt: 'Biblioteca no modo Grade, com todas as capas no mesmo quadro em pé.'},
+        {file: 'library-details', title: 'Música tema e trailers', description: 'Cada jogo pode ter a própria trilha, tocada sem internet, e um trailer sem som atrás dos detalhes.', alt: 'Detalhes de um jogo com a arte de fundo, a nota e as conquistas.'},
+      ],
+    },
   },
   en: {
     pageTitle: 'Your game library, organized',
@@ -137,6 +155,24 @@ const content = {
     readRelease: 'Read the release notes for version',
     getStartedTitle: 'Ready to organize your next adventure?',
     getStartedLead: 'Choose the installer or the portable version. The guide will walk you through your first steps.',
+    highlights: {
+      title: 'New in 1.0.0',
+      lead: 'Fullscreen is here, with four themes for playing from the couch, and every cover now looks the same.',
+      notes: 'Read the full release notes',
+      themesTitle: 'Fullscreen for the TV',
+      themesDescription: 'Browse your library with a DualSense, a keyboard or a mouse. Pick one of four themes, each with its own home screen, game details and sounds.',
+      themesLabel: 'Fullscreen themes',
+      themes: [
+        {label: 'Playtrove', file: 'fullscreen-library', alt: 'Playtrove fullscreen theme, with the featured game and a row of covers.'},
+        {label: 'Horizon', file: 'fullscreen-horizonte', alt: 'Horizon fullscreen theme, with a row of games on top, the art filling the screen and cards for trophies, playtime and rating.'},
+        {label: 'Mosaic', file: 'fullscreen-mosaico', alt: 'Mosaic fullscreen theme, with big covers and round shortcuts in dark gray and red.'},
+        {label: 'Panel', file: 'fullscreen-painel', alt: 'Panel fullscreen theme, with art in the background and tiles for continue playing, collections, achievements and statistics.'},
+      ],
+      cards: [
+        {file: 'library-grid', title: 'Matching covers everywhere', description: 'Every cover uses the same upright frame, as in Playnite, and comes first from SteamGridDB.', alt: 'Library in Grid view, with every cover in the same upright frame.'},
+        {file: 'library-details', title: 'Theme music and trailers', description: 'Each game can have its own soundtrack, played offline, and a silent trailer behind its details.', alt: 'Game details with background art, rating and achievements.'},
+      ],
+    },
   },
 } as const;
 
@@ -161,6 +197,37 @@ function DownloadActions({ locale }: { locale: Locale }): ReactNode {
       <a className="pt-button pt-button-secondary" href={releases.latest.downloads.portable}>{copy.portable}</a>
       <Link className="pt-text-link" to={guideUrl}>{copy.guide}<Arrow /></Link>
     </div>
+  );
+}
+
+/** As novidades da versão em destaque, escritas à mão a cada lançamento, com as capturas da biblioteca de demonstração. */
+const HIGHLIGHTS_VERSION = '1.0.0';
+
+function Highlights({ locale }: { locale: Locale }): ReactNode {
+  const copy = content[locale].highlights;
+  const base = useBaseUrl(`/img/highlights/${locale}/`);
+  const notesUrl = useBaseUrl(`/blog/releases/${HIGHLIGHTS_VERSION}/`);
+  // O link só aparece com a release publicada (nos testes, a fixture tem releases mais antigas).
+  const published = releases.releases.some((release) => release.version === HIGHLIGHTS_VERSION);
+  return (
+    <section className="pt-highlights" aria-labelledby="highlights-heading">
+      <Reveal className="pt-container pt-section-intro">
+        <h2 id="highlights-heading">{copy.title}</h2>
+        <p>{copy.lead}{published && <> <Link className="pt-text-link" to={notesUrl}>{copy.notes}<Arrow /></Link></>}</p>
+      </Reveal>
+      <FeatureShowcase id="highlights-themes-heading" title={copy.themesTitle} description={copy.themesDescription}
+        groupLabel={copy.themesLabel}
+        views={copy.themes.map((theme) => ({label: theme.label, src: `${base}${theme.file}.webp`, alt: theme.alt}))} />
+      <Reveal className="pt-container pt-highlight-cards">
+        {copy.cards.map((card) => (
+          <article className="pt-highlight-card" key={card.file}>
+            <img src={`${base}${card.file}.webp`} width="1280" height="800" alt={card.alt} loading="lazy" decoding="async" />
+            <h3>{card.title}</h3>
+            <p>{card.description}</p>
+          </article>
+        ))}
+      </Reveal>
+    </section>
   );
 }
 
@@ -213,6 +280,8 @@ export default function Home(): ReactNode {
             <Link to={latestUrl} title={copy.releaseNotes}>v{releases.latest.version}</Link>
           </p>
         </header>
+
+        <Highlights locale={locale} />
 
         <DemoVideo key={media} src={media} poster={poster} label={copy.demoLabel}
           playLabel={copy.playDemo} pauseLabel={copy.pauseDemo} failureText={copy.demoFailure}
