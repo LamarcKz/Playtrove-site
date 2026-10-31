@@ -136,15 +136,19 @@ a { text-underline-offset: 0.2em; }
 .pt-view-options button:hover { color: #fff; background: #2a303a; }
 .pt-view-options button[aria-pressed='true'] { background: var(--pt-brand); color: #fff; }
 .pt-privacy { padding-block: 3.5rem; text-align: center; }
-/* Novidades da versão: os temas da tela cheia e dois cartões com as outras novidades. */
-.pt-highlights { padding-top: clamp(2.5rem, 5vw, 4.5rem); }
-.pt-highlights .pt-section-intro .pt-text-link { margin-left: 0.25rem; white-space: nowrap; }
-.pt-highlight-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1.5rem, 3vw, 2.5rem); padding-bottom: clamp(3rem, 5vw, 4.5rem); }
+/* O cartão da versão em destaque, dentro das Novidades: o resumo, três destaques com imagem e o link das notas. */
+.pt-highlights { margin-top: 2rem; padding: clamp(1.25rem, 3vw, 2.25rem); border: 1px solid var(--pt-border); border-radius: 1rem; background: #171a20; }
+.pt-highlights-head { display: grid; gap: 0.6rem; max-width: 760px; margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+.pt-highlights-head h3 { margin: 0; font-size: clamp(1.5rem, 2.6vw, 2.1rem); font-weight: 650; letter-spacing: -0.03em; }
+.pt-highlights-head p { margin: 0; font-size: 1.05rem; line-height: 1.7; }
+.pt-highlights-head .pt-text-link { justify-self: start; }
+.pt-highlight-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1rem, 2.5vw, 1.75rem); }
 .pt-highlight-card { min-width: 0; }
-.pt-highlight-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; border: 1px solid #3a424e; border-radius: 0.75rem; background: #0d0f12; }
-.pt-highlight-card h3 { margin: 1.1rem 0 0.4rem; font-size: 1.25rem; font-weight: 650; }
-.pt-highlight-card p { margin: 0; line-height: 1.7; }
-@media (max-width: 760px) { .pt-highlight-cards { grid-template-columns: minmax(0, 1fr); } }
+.pt-highlight-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; border: 1px solid #3a424e; border-radius: 0.6rem; background: #0d0f12; }
+.pt-highlight-card h4 { margin: 0.9rem 0 0.35rem; font-size: 1.08rem; font-weight: 650; }
+.pt-highlight-card p { margin: 0; font-size: 0.95rem; line-height: 1.65; }
+.pt-release-previous { margin: 2.5rem 0 0.25rem; font-size: 1rem; font-weight: 600; color: var(--pt-muted); }
+@media (max-width: 900px) { .pt-highlight-cards { grid-template-columns: minmax(0, 1fr); } }
 .pt-privacy > svg { display: block; margin: 0 auto 1rem; color: #a9b3c2; }
 .pt-privacy h3 { margin: 0 auto 0.65rem; font-size: 1.4rem; font-weight: 650; letter-spacing: -0.025em; }
 .pt-privacy p { max-width: 740px; margin: 0 auto; font-size: 0.98rem; line-height: 1.75; }

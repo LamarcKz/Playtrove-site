@@ -1,12 +1,12 @@
 {
-  "version": "0.7.1",
+  "version": "1.0.0",
   "width": 1280,
   "height": 800,
   "fps": 30,
-  "durationSeconds": 29,
+  "durationSeconds": 37,
   "locales": {
     "pt-BR": {
-      "video": "/media/demo/en/playtrove-0.7.1.webm",
+      "video": "/media/demo/en/playtrove-1.0.0.webm",
       "poster": "/img/demo/en/poster.png",
       "images": {
         "library-grid": "/img/demo/pt-BR/library-grid.png",
@@ -16,7 +16,7 @@
       }
     },
     "en": {
-      "video": "/media/demo/en/playtrove-0.7.1.webm",
+      "video": "/media/demo/en/playtrove-1.0.0.webm",
       "poster": "/img/demo/en/poster.png",
       "images": {
         "library-grid": "/img/demo/en/library-grid.png",
