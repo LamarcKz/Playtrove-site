@@ -19,6 +19,7 @@ const DOCUMENTS = [
   { slug: 'getting-started', pt: 'Primeiros passos', en: 'Getting started' },
   { slug: 'emulators', pt: 'Emuladores e pastas de ROMs', en: 'Emulators and ROM folders' },
   { slug: 'library', pt: 'Organizar a biblioteca', en: 'Organize your library' },
+  { slug: 'fullscreen', pt: 'Tela cheia', en: 'Fullscreen' },
   { slug: 'metadata', pt: 'Metadados e imagens', en: 'Metadata and images' },
   { slug: 'achievements', pt: 'Conquistas e troféus', en: 'Achievements and trophies' },
   { slug: 'statistics', pt: 'Tempo jogado e estatísticas', en: 'Playtime and statistics' },

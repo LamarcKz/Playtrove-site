@@ -1,0 +1,18 @@
+{
+  "guideSidebar": [
+    "installation",
+    "getting-started",
+    "emulators",
+    "library",
+    "fullscreen",
+    "metadata",
+    "achievements",
+    "statistics",
+    "data-updates",
+    "troubleshooting"
+  ],
+  "contributingSidebar": [
+    "contributing",
+    "architecture"
+  ]
+}
